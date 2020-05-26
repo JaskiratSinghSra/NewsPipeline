@@ -15,7 +15,7 @@ class Pipeline:
         self.age = 12
         self.news_client = NewsApiClient(api_key=API_KEY)
 
-    def get_headlines(self):
+    def get_articles(self):
         start_date = datetime.now() - timedelta(minutes=15)
         end_date = datetime.now()
         start_date = start_date.replace(tzinfo=timezone.utc).timestamp()
@@ -32,7 +32,7 @@ class Pipeline:
 
     def run(self):
         while True:
-            articles = self.get_headlines()
+            articles = self.get_articles()
             sleep(60)
 
 
