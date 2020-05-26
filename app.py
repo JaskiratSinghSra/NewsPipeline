@@ -1,8 +1,12 @@
 import requests
 from newsapi import NewsApiClient
 import logging
+from time import sleep
+import os
+import sys
+
 API_KEY = ''
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 class Pipeline:
@@ -12,23 +16,26 @@ class Pipeline:
         self.news_client = NewsApiClient(api_key=API_KEY)
 
     def get_headlines(self):
-        start_date = datetime.now() - timedelta(minutes=1)
+        start_date = datetime.now() - timedelta(minutes=15)
         end_date = datetime.now()
-        start_date = start_date.strftime('%Y-%m-%d')
-        end_date = end_date.strftime('%Y-%m-%d')
+        start_date = start_date.replace(tzinfo=timezone.utc).timestamp()
+        end_date = end_date.replace(tzinfo=timezone.utc).timestamp()
+        print("Fetching articles from News API")
         articles = self.news_client.get_everything(q='Google',
-                                                        from_param=start_date,
-                                                        to=end_date,
-                                                        language='en',
-                                                        sort_by='relevancy',
-                                                        page=2)
+                                                   from_param=start_date,
+                                                   to=end_date,
+                                                   language='en',
+                                                   sort_by='relevancy',
+                                                   page=2)
         print("Total articles %s fetched in this run." % (articles['totalResults']))
         return articles
 
     def run(self):
-        articles = self.get_headlines()
+        while True:
+            articles = self.get_headlines()
+            sleep(60)
 
 
-obj = Pipeline()
-
-obj.run()
+if __name__ == '__main__':
+    controller = Pipeline()
+    controller.run()
